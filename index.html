@@ -1,0 +1,180 @@
+<html>
+<head>
+    <script defer src="https://unpkg.com/alpinejs@3.5.0/dist/cdn.min.js"></script>
+</head>
+<body>
+    <!-- GET request for getting a pokemon -->
+<div class="main" x-data="init()">
+    <h4 class="font-xxlarge">GET a pokemon</h4>
+    <div class="searchArea">
+            <input
+            class="inputText"
+            type="number" 
+            placeholder="Type a number"
+            x-model="p"
+            @keyup.enter="search_pokemon()"
+            />
+            <button class="bg-default" @click="search_pokemon()">find_pokemon</button>
+            <br><br>
+    </div>
+    <div id="MyPokemons">
+    </div>
+    
+    
+</div>
+<!-- POST request for adding pokemon -->
+<p>Add a new pokemon to the application</p>
+<div x-data="{
+    pokemondata: null,
+    pokedexs: null,
+    pokenames: null,
+    type1s: null,
+    regions: null,
+    async callmethod2() {
+        this.pokemondata = await (await fetch('https://useritem-api-service-runemannaerts.cloud.okteto.net/pokemons/', 
+        {
+            method: 'POST',
+            body: JSON.stringify({
+                pokedex: this.pokedexs,
+                pokename: this.pokenames,
+                type1: this.type1s,
+                region: this.regions,
+            }),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            },
+        })).json();
+
+        console.log(this.pokemondata);
+    },
+}">
+    <input type="number" x-model="pokedexs">
+    <input type="text" x-model="pokenames">
+    <input type="text" x-model="type1s">
+    <input type="number" x-model="regions">
+    <button x-on:click="callmethod2">Call method</button>
+
+    <p>Data inserted with id: <strong x-text="pokemondata.id"></strong></p>
+    <p>pokedex that was inserted: <strong x-text="pokemondata.pokedex"></strong></p>
+    <p>pokemon name that was inserted: <strong x-text="pokemondata.pokename"></strong></p>
+    <p>type pokemon that was inserted: <strong x-text="pokemondata.type1"></strong></p>
+    <p>pokemon region that was inserted: <strong x-text="pokemondata.region"></strong></p>
+
+</div>
+<!-- GET request for getting a region in pokemon-->
+
+<div class="main" x-data="find_region()">
+    <h4 class="font-xxlarge">GET a region</h4>
+    <div class="searchArea">
+        <input
+        class="inputText"
+        type="number" 
+        placeholder="Type a number"
+        x-model="r"
+        @keyup.enter="find_region()"
+        />
+        <button class="bg-default" @click="find_regions()">find_region</button>
+        <br><br>
+    </div>
+    <div id="myRegions">
+    </div>
+  </div>
+
+
+</div>
+<!-- POST request for adding regin -->
+<p>Add a new region to the application</p>
+<div x-data="{
+    responsedata: null,
+    regionName: null,
+    async callmethod1() {
+        this.responsedata = await (await fetch('https://useritem-api-service-runemannaerts.cloud.okteto.net/regions/', 
+        {
+            method: 'POST',
+            body: JSON.stringify({
+                name: this.regionName,
+            }),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            },
+        })).json();
+
+        console.log(this.responsedata);
+    },
+}">
+    <input type="text" x-model="regionName">
+    <button x-on:click="callmethod1">Call method</button>
+
+    <p>Data inserted with id: <strong x-text="responsedata.id"></strong></p>
+    <p>region that was inserted: <strong x-text="responsedata.name"></strong></p>
+
+</div>
+</div>
+</body>
+<script>
+    function find_region() {
+    return {
+      regions: null,
+      r: "",
+      find_regions: function () {
+        fetch(
+          "https://useritem-api-service-runemannaerts.cloud.okteto.net/regions/" + this.r
+        )
+          .then((response) => response.json())
+          .then((response) => (regions = response,  console.log(response)))
+          .then((response) => (regions))
+          .catch((err) => console.log(err))
+          .then(function(regions) {
+            giveRegion(regions)
+          });
+        
+        // console.log(response);
+      },
+    };
+  }
+  function giveRegion(regions){
+        var mainContainer = document.getElementById("myRegions");
+        var div = document.createElement("div");
+        let name = regions
+        div.innerHTML = 'Name: ' + name.name;
+        mainContainer.appendChild(div)
+    }
+
+    function init() {
+    return {
+      pokemons: null,
+      p: "",
+      search_pokemon: function () {
+        fetch(
+          "https://useritem-api-service-runemannaerts.cloud.okteto.net/pokemons/" + this.p
+        )
+          .then((response) => response.json())
+          .then((response) => (pokemons = response,  console.log(response)))
+          .then((response) => (pokemons))
+          .catch((err) => console.log(err))
+          .then(function(pokemons) {
+            givePokemon(pokemons)
+          });
+        
+        // console.log(response);
+      },
+    };
+  }
+  function givePokemon(pokemons){
+        var mainContainer = document.getElementById("MyPokemons");
+        var pokedexs = document.createElement("p");
+        var pokenames = document.createElement("p");
+        var type = document.createElement("p");
+        var regions = document.createElement("p");
+        let name = pokemons
+        pokedexs.innerHTML = 'pokedex: ' + name.pokedex;
+        mainContainer.appendChild(pokedexs)   
+        pokenames.innerHTML = 'pokemonname: ' + name.pokename;
+        mainContainer.appendChild(pokenames)
+        type.innerHTML = 'type: ' + name.type1;
+        mainContainer.appendChild(type)
+        regions.innerHTML = 'region: ' + name.region;
+        mainContainer.appendChild(regions)
+    }
+</script>
+</html>
